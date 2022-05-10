@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import * as ReactDOM from 'react-dom/client';
 import appConfig from './config';
 import Cookies from 'js-cookie'
 
@@ -31,9 +31,10 @@ const ChatRoom = () => {
   const messagesBoxRef = React.useRef()
   const [isSendingMessage, setIsSendingMessage] = React.useState(false)
   const [message, setMessage] = React.useState('')
-  const [profile, setProfile] = React.useState({})
+  const [profile, setProfile] = React.useState(null)
   const [messages, setMessages] = React.useState([])
   const [users, setUsers] = React.useState([])
+  const [hasNewMessage, setHasNewMessage] = React.useState(false)
 
   const debounceTyping = e => watchTyping(e, profile)
 
@@ -85,13 +86,23 @@ const ChatRoom = () => {
       window.Echo.private('user-state')
       .listen('UserState', (e) => {
         setUsers(prev => {
-          return prev.map(user => {
-            if(user.id === e.user.id){
-              return e.user
-            }
+          const isExist = prev.find(x => +x.id === +e.user.id)
+          if(isExist)
+            return prev.map(user => {
+              if(+user.id === +e.user.id){
+                return e.user
+              }
 
-            return user
-          })
+              return user
+            })
+
+          return [
+            ...prev,
+            {
+              ...e.user,
+              color: generatePastelColor()
+            }
+          ]
         })
       });
     }
@@ -119,6 +130,7 @@ const ChatRoom = () => {
           ...prev,
           e.message
         ])
+        setHasNewMessage(true)
       });
     }
   }
@@ -165,6 +177,29 @@ const ChatRoom = () => {
       Cookies.remove('token')
       window.location.href = '/'
     }
+  }
+
+  const scrollToBottom = e => {
+    e.preventDefault()
+    messagesBoxRef.current.scrollTop  = messagesBoxRef.current.scrollHeight
+    setHasNewMessage(false)
+  }
+
+  if(!profile){
+    return (
+      <div className="flex h-screen w-screen">
+        <div className="m-auto">
+          <svg
+            className="w-10 h-10 animate-spin fill-current text-blue-500"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1000 1000"
+            xmlSpace="preserve"
+          >
+            <path d="M669.7 25.7c-10.6-4-22.4 1.5-26.3 12.1-3.9 10.6 1.5 22.4 12.1 26.3C831 129 949 298.4 949 485.6c0 247.6-201.4 449-449 449S51 733.1 51 485.6c0-186.3 117.2-355.3 291.5-420.7 10.6-4 16-15.8 12-26.3-4-10.6-15.9-16-26.4-12C137.8 97.8 10 282.3 10 485.6c0 270.2 219.8 490 490 490s490-219.8 490-490c0-204.3-128.7-389.1-320.3-459.9z" />
+          </svg>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -229,9 +264,11 @@ const ChatRoom = () => {
 
                   <div className="ml-2 text-sm font-semibold flex item-center space-x-1"><p>{user.name}</p>{user.typing ? <p className="text-xs">typing...</p> : null}</div>
                   {user?.is_active ? <div
+                    title="Online"
                     className="flex items-center justify-center ml-auto text-xs text-white bg-green-500 h-4 w-4 rounded-full leading-none"
                   /> : <div
-                  className="flex items-center justify-center ml-auto text-xs text-white bg-red-500 h-4 w-4 rounded-full leading-none"
+                  title="Offline"
+                  className="flex items-center justify-center ml-auto text-xs text-white bg-gray-300 h-4 w-4 rounded-full leading-none"
                 />}
 
                 </button>
@@ -244,7 +281,7 @@ const ChatRoom = () => {
         <div
           className="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4"
         >
-          <div ref={messagesBoxRef} className="flex flex-col h-full overflow-x-auto mb-4">
+          <div ref={messagesBoxRef} className="flex flex-col h-full overflow-x-auto mb-4 relative">
             <div className="flex flex-col h-full">
               <div className="grid grid-cols-12 gap-y-2">
                 {messages.map((message, i) => {
@@ -288,17 +325,20 @@ const ChatRoom = () => {
                     </div>
                   )
                 })}
+
               </div>
             </div>
+            {hasNewMessage ?
+            <button onClick={scrollToBottom} className="mx-auto bg-indigo-100 fixed bottom-32 left-1/2 translate-x-1/2 rounded-lg px-3 font-medium"><p>New messages</p></button> : null}
           </div>
           <form
             onSubmit={onHandleSendMessage}
             className="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4"
           >
-
             <div className="flex-grow ml-4">
               <div  className="relative w-full">
                 <input
+                  required
                   onKeyDown={debounceTyping}
                   ref={messageBoxRef}
                   value={message}
@@ -356,5 +396,6 @@ const ChatRoom = () => {
 }
 
 if (document.getElementById('chat-room')) {
-  ReactDOM.render(<ChatRoom />, document.getElementById('chat-room'));
+  const root = ReactDOM.createRoot(document.getElementById('chat-room'));
+  root.render(<ChatRoom />);
 }

@@ -1,12 +1,13 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import * as ReactDOM from 'react-dom/client';
 import appConfig from './config';
 
 const Register = () => {
-
+  const [notification, setNotification] = React.useState(null)
+  const [isLoading, setIsLoading] = React.useState(false)
   const [formData, setFormData] = React.useState({
-    email: 'enteng@email.com',
-    password: '123123123',
+    email: '',
+    password: '',
     name: '',
     password_confirmation: ''
   })
@@ -20,11 +21,25 @@ const Register = () => {
 
   const onHandleSubmit = async e => {
     e.preventDefault()
+    setIsLoading(true)
     const response = await axios.post(`${appConfig.baseUrl}/register`, formData, appConfig.axiosConfig)
+    setIsLoading(false)
     if(response.status === 201){
       document.cookie = `token=${response.data.access_token}`;
-      window.location.href = '/'
+      setFormData({
+        email: '',
+        password: '',
+        name: '',
+        password_confirmation: ''
+      })
+      setNotification({
+        'success': 'Successfully registered!'
+      })
     }
+    if(response.status === 422){
+      setNotification(response.data)
+    }
+
   }
 
   return (
@@ -37,6 +52,7 @@ const Register = () => {
             >
               Register
             </div>
+            <p className="text-xs text-green-500">{notification?.['success'] || null }</p>
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-normal mb-2"
@@ -49,12 +65,12 @@ const Register = () => {
                 name="email"
                 v-model="form.email"
                 type="email"
-                required
                 autoFocus
                 placeholder="Email"
                 onChange={onChange}
                 value={formData.email}
               />
+              <p className="text-xs text-red-500">{notification?.['email'] || null }</p>
             </div>
             <div className="mb-4">
               <label
@@ -68,12 +84,12 @@ const Register = () => {
                 name="name"
                 v-model="form.name"
                 type="name"
-                required
                 autoFocus
                 placeholder="Name"
                 onChange={onChange}
                 value={formData.name}
               />
+              <p className="text-xs text-red-500">{notification?.['name'] || null }</p>
             </div>
             <div className="mb-6">
               <label
@@ -88,11 +104,11 @@ const Register = () => {
                 type="password"
                 placeholder="Password"
                 name="password"
-                required
                 autoComplete="current-password"
                 onChange={onChange}
                 value={formData.password}
               />
+              <p className="text-xs text-red-500">{notification?.['password'] || null }</p>
             </div>
             <div className="mb-6">
               <label
@@ -107,14 +123,26 @@ const Register = () => {
                 type="password"
                 placeholder="password_confirmation"
                 name="password_confirmation"
-                required
                 autoComplete="current-password"
                 onChange={onChange}
                 value={formData.password_confirmation}
               />
+              <p className="text-xs text-red-500">{notification?.['password_confirmation'] || null }</p>
             </div>
             <div className="flex items-center justify-between">
-              <button className="px-4 py-2 rounded text-white inline-block shadow-lg bg-blue-500 hover:bg-blue-600 focus:bg-blue-700" type="submit">Submit</button>
+              <button className="px-4 py-2 rounded text-white inline-block shadow-lg bg-blue-500 hover:bg-blue-600 focus:bg-blue-700" type="submit">
+                {isLoading ?
+                    <svg
+                      className="w-6 h-6 animate-spin fill-current text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 1000 1000"
+                      xmlSpace="preserve"
+                    >
+                      <path d="M669.7 25.7c-10.6-4-22.4 1.5-26.3 12.1-3.9 10.6 1.5 22.4 12.1 26.3C831 129 949 298.4 949 485.6c0 247.6-201.4 449-449 449S51 733.1 51 485.6c0-186.3 117.2-355.3 291.5-420.7 10.6-4 16-15.8 12-26.3-4-10.6-15.9-16-26.4-12C137.8 97.8 10 282.3 10 485.6c0 270.2 219.8 490 490 490s490-219.8 490-490c0-204.3-128.7-389.1-320.3-459.9z" />
+                    </svg>
+                  : null}
+                  {!isLoading ? 'Submit' : null}
+              </button>
               <a
                 className="inline-block align-baseline font-normal text-sm text-blue-500 hover:text-blue-800"
                 href="/"
@@ -132,6 +160,7 @@ const Register = () => {
   );
 }
 
-if(document.getElementById('chat-register-form')) {
-  ReactDOM.render(<Register />, document.getElementById('chat-register-form'));
+if (document.getElementById('chat-register-form')) {
+  const root = ReactDOM.createRoot(document.getElementById('chat-register-form'));
+  root.render(<Register />);
 }

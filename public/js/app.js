@@ -2130,10 +2130,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./config */ "./resources/js/config.js");
 /* harmony import */ var js_cookie__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! js-cookie */ "./node_modules/js-cookie/dist/js.cookie.mjs");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -2141,8 +2143,6 @@ function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread n
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-
-
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -2209,7 +2209,7 @@ var ChatRoom = function ChatRoom() {
       message = _React$useState4[0],
       setMessage = _React$useState4[1];
 
-  var _React$useState5 = react__WEBPACK_IMPORTED_MODULE_2___default().useState({}),
+  var _React$useState5 = react__WEBPACK_IMPORTED_MODULE_2___default().useState(null),
       _React$useState6 = _slicedToArray(_React$useState5, 2),
       profile = _React$useState6[0],
       setProfile = _React$useState6[1];
@@ -2223,6 +2223,11 @@ var ChatRoom = function ChatRoom() {
       _React$useState10 = _slicedToArray(_React$useState9, 2),
       users = _React$useState10[0],
       setUsers = _React$useState10[1];
+
+  var _React$useState11 = react__WEBPACK_IMPORTED_MODULE_2___default().useState(false),
+      _React$useState12 = _slicedToArray(_React$useState11, 2),
+      hasNewMessage = _React$useState12[0],
+      setHasNewMessage = _React$useState12[1];
 
   var debounceTyping = function debounceTyping(e) {
     return watchTyping(e, profile);
@@ -2285,13 +2290,19 @@ var ChatRoom = function ChatRoom() {
             case 6:
               window.Echo["private"]('user-state').listen('UserState', function (e) {
                 setUsers(function (prev) {
-                  return prev.map(function (user) {
-                    if (user.id === e.user.id) {
+                  var isExist = prev.find(function (x) {
+                    return +x.id === +e.user.id;
+                  });
+                  if (isExist) return prev.map(function (user) {
+                    if (+user.id === +e.user.id) {
                       return e.user;
                     }
 
                     return user;
                   });
+                  return [].concat(_toConsumableArray(prev), [_objectSpread(_objectSpread({}, e.user), {}, {
+                    color: generatePastelColor()
+                  })]);
                 });
               });
 
@@ -2376,6 +2387,7 @@ var ChatRoom = function ChatRoom() {
                 setMessages(function (prev) {
                   return [].concat(_toConsumableArray(prev), [e.message]);
                 });
+                setHasNewMessage(true);
               });
 
             case 8:
@@ -2489,6 +2501,30 @@ var ChatRoom = function ChatRoom() {
     };
   }();
 
+  var scrollToBottom = function scrollToBottom(e) {
+    e.preventDefault();
+    messagesBoxRef.current.scrollTop = messagesBoxRef.current.scrollHeight;
+    setHasNewMessage(false);
+  };
+
+  if (!profile) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+      className: "flex h-screen w-screen",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+        className: "m-auto",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("svg", {
+          className: "w-10 h-10 animate-spin fill-current text-blue-500",
+          xmlns: "http://www.w3.org/2000/svg",
+          viewBox: "0 0 1000 1000",
+          xmlSpace: "preserve",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("path", {
+            d: "M669.7 25.7c-10.6-4-22.4 1.5-26.3 12.1-3.9 10.6 1.5 22.4 12.1 26.3C831 129 949 298.4 949 485.6c0 247.6-201.4 449-449 449S51 733.1 51 485.6c0-186.3 117.2-355.3 291.5-420.7 10.6-4 16-15.8 12-26.3-4-10.6-15.9-16-26.4-12C137.8 97.8 10 282.3 10 485.6c0 270.2 219.8 490 490 490s490-219.8 490-490c0-204.3-128.7-389.1-320.3-459.9z"
+          })
+        })
+      })
+    });
+  }
+
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
     className: "flex h-screen antialiased text-gray-800",
     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
@@ -2568,9 +2604,11 @@ var ChatRoom = function ChatRoom() {
                     children: "typing..."
                   }) : null]
                 }), user !== null && user !== void 0 && user.is_active ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+                  title: "Online",
                   className: "flex items-center justify-center ml-auto text-xs text-white bg-green-500 h-4 w-4 rounded-full leading-none"
                 }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
-                  className: "flex items-center justify-center ml-auto text-xs text-white bg-red-500 h-4 w-4 rounded-full leading-none"
+                  title: "Offline",
+                  className: "flex items-center justify-center ml-auto text-xs text-white bg-gray-300 h-4 w-4 rounded-full leading-none"
                 })]
               }, "user".concat(user.id));
             })
@@ -2580,10 +2618,10 @@ var ChatRoom = function ChatRoom() {
         className: "flex flex-col flex-auto h-full p-6",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
           className: "flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
             ref: messagesBoxRef,
-            className: "flex flex-col h-full overflow-x-auto mb-4",
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+            className: "flex flex-col h-full overflow-x-auto mb-4 relative",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
               className: "flex flex-col h-full",
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
                 className: "grid grid-cols-12 gap-y-2",
@@ -2631,7 +2669,13 @@ var ChatRoom = function ChatRoom() {
                   }, "message".concat(i));
                 })
               })
-            })
+            }), hasNewMessage ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("button", {
+              onClick: scrollToBottom,
+              className: "mx-auto bg-indigo-100 fixed bottom-32 left-1/2 translate-x-1/2 rounded-lg px-3 font-medium",
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("p", {
+                children: "New messages"
+              })
+            }) : null]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("form", {
             onSubmit: onHandleSendMessage,
             className: "flex flex-row items-center h-16 rounded-xl bg-white w-full px-4",
@@ -2640,6 +2684,7 @@ var ChatRoom = function ChatRoom() {
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
                 className: "relative w-full",
                 children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("input", {
+                  required: true,
                   onKeyDown: debounceTyping,
                   ref: messageBoxRef,
                   value: message,
@@ -2694,7 +2739,8 @@ var ChatRoom = function ChatRoom() {
 };
 
 if (document.getElementById('chat-room')) {
-  react_dom__WEBPACK_IMPORTED_MODULE_3__.render( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(ChatRoom, {}), document.getElementById('chat-room'));
+  var root = react_dom_client__WEBPACK_IMPORTED_MODULE_3__.createRoot(document.getElementById('chat-room'));
+  root.render( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(ChatRoom, {}));
 }
 
 /***/ }),
@@ -2733,7 +2779,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./config */ "./resources/js/config.js");
 /* harmony import */ var js_cookie__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! js-cookie */ "./node_modules/js-cookie/dist/js.cookie.mjs");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
@@ -2769,13 +2815,23 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 var Login = function Login() {
-  var _React$useState = react__WEBPACK_IMPORTED_MODULE_1___default().useState({
-    email: 'enteng@email.com',
-    password: '123123123'
-  }),
+  var _React$useState = react__WEBPACK_IMPORTED_MODULE_1___default().useState(null),
       _React$useState2 = _slicedToArray(_React$useState, 2),
-      formData = _React$useState2[0],
-      setFormData = _React$useState2[1];
+      notification = _React$useState2[0],
+      setNotification = _React$useState2[1];
+
+  var _React$useState3 = react__WEBPACK_IMPORTED_MODULE_1___default().useState(false),
+      _React$useState4 = _slicedToArray(_React$useState3, 2),
+      isLoading = _React$useState4[0],
+      setIsLoading = _React$useState4[1];
+
+  var _React$useState5 = react__WEBPACK_IMPORTED_MODULE_1___default().useState({
+    email: '',
+    password: ''
+  }),
+      _React$useState6 = _slicedToArray(_React$useState5, 2),
+      formData = _React$useState6[0],
+      setFormData = _React$useState6[1];
 
   var onChange = function onChange(e) {
     setFormData(_objectSpread(_objectSpread({}, formData), {}, _defineProperty({}, e.target.name, e.target.value)));
@@ -2789,18 +2845,30 @@ var Login = function Login() {
           switch (_context.prev = _context.next) {
             case 0:
               e.preventDefault();
-              _context.next = 3;
+              setIsLoading(true);
+              _context.next = 4;
               return axios.post("".concat(_config__WEBPACK_IMPORTED_MODULE_3__["default"].baseUrl, "/login"), formData, _config__WEBPACK_IMPORTED_MODULE_3__["default"].axiosConfig);
 
-            case 3:
+            case 4:
               response = _context.sent;
+              setIsLoading(false);
 
               if (response.status === 200) {
                 js_cookie__WEBPACK_IMPORTED_MODULE_4__["default"].set('token', response.data.access_token);
                 window.location.href = '/chat-room';
               }
 
-            case 5:
+              if (response.status === 422) {
+                setNotification(response.data);
+              }
+
+              if (response.status === 401) {
+                setNotification({
+                  'error': 'Invalid credentials'
+                });
+              }
+
+            case 9:
             case "end":
               return _context.stop();
           }
@@ -2825,6 +2893,9 @@ var Login = function Login() {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
             className: "text-gray-800 text-2xl flex justify-center border-b-2 py-2 mb-4",
             children: "Simple Chat"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("p", {
+            className: "text-xs text-red-500",
+            children: (notification === null || notification === void 0 ? void 0 : notification['error']) || null
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
             className: "mb-4",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("label", {
@@ -2836,11 +2907,13 @@ var Login = function Login() {
               name: "email",
               "v-model": "form.email",
               type: "email",
-              required: true,
               autoFocus: true,
               placeholder: "Email",
               onChange: onChange,
               value: formData.email
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("p", {
+              className: "text-xs text-red-500",
+              children: (notification === null || notification === void 0 ? void 0 : notification['email']) || null
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
             className: "mb-6",
@@ -2854,17 +2927,28 @@ var Login = function Login() {
               type: "password",
               placeholder: "Password",
               name: "password",
-              required: true,
               autoComplete: "current-password",
               onChange: onChange,
               value: formData.password
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("p", {
+              className: "text-xs text-red-500",
+              children: (notification === null || notification === void 0 ? void 0 : notification['password']) || null
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
             className: "flex items-center justify-between",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("button", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("button", {
+              disabled: isLoading,
               className: "px-4 py-2 rounded text-white inline-block shadow-lg bg-blue-500 hover:bg-blue-600 focus:bg-blue-700",
               type: "submit",
-              children: "Sign In"
+              children: [isLoading ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("svg", {
+                className: "w-6 h-6 animate-spin fill-current text-white",
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 1000 1000",
+                xmlSpace: "preserve",
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("path", {
+                  d: "M669.7 25.7c-10.6-4-22.4 1.5-26.3 12.1-3.9 10.6 1.5 22.4 12.1 26.3C831 129 949 298.4 949 485.6c0 247.6-201.4 449-449 449S51 733.1 51 485.6c0-186.3 117.2-355.3 291.5-420.7 10.6-4 16-15.8 12-26.3-4-10.6-15.9-16-26.4-12C137.8 97.8 10 282.3 10 485.6c0 270.2 219.8 490 490 490s490-219.8 490-490c0-204.3-128.7-389.1-320.3-459.9z"
+                })
+              }) : null, !isLoading ? 'Sign In' : null]
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("a", {
               className: "inline-block align-baseline font-normal text-sm text-blue-500 hover:text-blue-800",
               href: "/register",
@@ -2881,7 +2965,8 @@ var Login = function Login() {
 };
 
 if (document.getElementById('chat-login-form')) {
-  react_dom__WEBPACK_IMPORTED_MODULE_2__.render( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(Login, {}), document.getElementById('chat-login-form'));
+  var root = react_dom_client__WEBPACK_IMPORTED_MODULE_2__.createRoot(document.getElementById('chat-login-form'));
+  root.render( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(Login, {}));
 }
 
 /***/ }),
@@ -2898,7 +2983,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./config */ "./resources/js/config.js");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 
@@ -2932,15 +3017,25 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 var Register = function Register() {
-  var _React$useState = react__WEBPACK_IMPORTED_MODULE_1___default().useState({
-    email: 'enteng@email.com',
-    password: '123123123',
+  var _React$useState = react__WEBPACK_IMPORTED_MODULE_1___default().useState(null),
+      _React$useState2 = _slicedToArray(_React$useState, 2),
+      notification = _React$useState2[0],
+      setNotification = _React$useState2[1];
+
+  var _React$useState3 = react__WEBPACK_IMPORTED_MODULE_1___default().useState(false),
+      _React$useState4 = _slicedToArray(_React$useState3, 2),
+      isLoading = _React$useState4[0],
+      setIsLoading = _React$useState4[1];
+
+  var _React$useState5 = react__WEBPACK_IMPORTED_MODULE_1___default().useState({
+    email: '',
+    password: '',
     name: '',
     password_confirmation: ''
   }),
-      _React$useState2 = _slicedToArray(_React$useState, 2),
-      formData = _React$useState2[0],
-      setFormData = _React$useState2[1];
+      _React$useState6 = _slicedToArray(_React$useState5, 2),
+      formData = _React$useState6[0],
+      setFormData = _React$useState6[1];
 
   var onChange = function onChange(e) {
     setFormData(_objectSpread(_objectSpread({}, formData), {}, _defineProperty({}, e.target.name, e.target.value)));
@@ -2954,18 +3049,32 @@ var Register = function Register() {
           switch (_context.prev = _context.next) {
             case 0:
               e.preventDefault();
-              _context.next = 3;
+              setIsLoading(true);
+              _context.next = 4;
               return axios.post("".concat(_config__WEBPACK_IMPORTED_MODULE_3__["default"].baseUrl, "/register"), formData, _config__WEBPACK_IMPORTED_MODULE_3__["default"].axiosConfig);
 
-            case 3:
+            case 4:
               response = _context.sent;
+              setIsLoading(false);
 
               if (response.status === 201) {
                 document.cookie = "token=".concat(response.data.access_token);
-                window.location.href = '/';
+                setFormData({
+                  email: '',
+                  password: '',
+                  name: '',
+                  password_confirmation: ''
+                });
+                setNotification({
+                  'success': 'Successfully registered!'
+                });
               }
 
-            case 5:
+              if (response.status === 422) {
+                setNotification(response.data);
+              }
+
+            case 8:
             case "end":
               return _context.stop();
           }
@@ -2990,6 +3099,9 @@ var Register = function Register() {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
             className: "text-gray-800 text-2xl flex justify-center border-b-2 py-2 mb-4",
             children: "Register"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("p", {
+            className: "text-xs text-green-500",
+            children: (notification === null || notification === void 0 ? void 0 : notification['success']) || null
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
             className: "mb-4",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("label", {
@@ -3001,11 +3113,13 @@ var Register = function Register() {
               name: "email",
               "v-model": "form.email",
               type: "email",
-              required: true,
               autoFocus: true,
               placeholder: "Email",
               onChange: onChange,
               value: formData.email
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("p", {
+              className: "text-xs text-red-500",
+              children: (notification === null || notification === void 0 ? void 0 : notification['email']) || null
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
             className: "mb-4",
@@ -3018,11 +3132,13 @@ var Register = function Register() {
               name: "name",
               "v-model": "form.name",
               type: "name",
-              required: true,
               autoFocus: true,
               placeholder: "Name",
               onChange: onChange,
               value: formData.name
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("p", {
+              className: "text-xs text-red-500",
+              children: (notification === null || notification === void 0 ? void 0 : notification['name']) || null
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
             className: "mb-6",
@@ -3036,10 +3152,12 @@ var Register = function Register() {
               type: "password",
               placeholder: "Password",
               name: "password",
-              required: true,
               autoComplete: "current-password",
               onChange: onChange,
               value: formData.password
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("p", {
+              className: "text-xs text-red-500",
+              children: (notification === null || notification === void 0 ? void 0 : notification['password']) || null
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
             className: "mb-6",
@@ -3053,17 +3171,27 @@ var Register = function Register() {
               type: "password",
               placeholder: "password_confirmation",
               name: "password_confirmation",
-              required: true,
               autoComplete: "current-password",
               onChange: onChange,
               value: formData.password_confirmation
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("p", {
+              className: "text-xs text-red-500",
+              children: (notification === null || notification === void 0 ? void 0 : notification['password_confirmation']) || null
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
             className: "flex items-center justify-between",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("button", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("button", {
               className: "px-4 py-2 rounded text-white inline-block shadow-lg bg-blue-500 hover:bg-blue-600 focus:bg-blue-700",
               type: "submit",
-              children: "Submit"
+              children: [isLoading ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("svg", {
+                className: "w-6 h-6 animate-spin fill-current text-white",
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 1000 1000",
+                xmlSpace: "preserve",
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("path", {
+                  d: "M669.7 25.7c-10.6-4-22.4 1.5-26.3 12.1-3.9 10.6 1.5 22.4 12.1 26.3C831 129 949 298.4 949 485.6c0 247.6-201.4 449-449 449S51 733.1 51 485.6c0-186.3 117.2-355.3 291.5-420.7 10.6-4 16-15.8 12-26.3-4-10.6-15.9-16-26.4-12C137.8 97.8 10 282.3 10 485.6c0 270.2 219.8 490 490 490s490-219.8 490-490c0-204.3-128.7-389.1-320.3-459.9z"
+                })
+              }) : null, !isLoading ? 'Submit' : null]
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("a", {
               className: "inline-block align-baseline font-normal text-sm text-blue-500 hover:text-blue-800",
               href: "/",
@@ -3080,7 +3208,8 @@ var Register = function Register() {
 };
 
 if (document.getElementById('chat-register-form')) {
-  react_dom__WEBPACK_IMPORTED_MODULE_2__.render( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(Register, {}), document.getElementById('chat-register-form'));
+  var root = react_dom_client__WEBPACK_IMPORTED_MODULE_2__.createRoot(document.getElementById('chat-register-form'));
+  root.render( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(Register, {}));
 }
 
 /***/ }),
@@ -56680,6 +56809,39 @@ if (
 }
         
   })();
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/react-dom/client.js":
+/*!******************************************!*\
+  !*** ./node_modules/react-dom/client.js ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+var m = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+if (false) {} else {
+  var i = m.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+  exports.createRoot = function(c, o) {
+    i.usingClientEntryPoint = true;
+    try {
+      return m.createRoot(c, o);
+    } finally {
+      i.usingClientEntryPoint = false;
+    }
+  };
+  exports.hydrateRoot = function(c, h, o) {
+    i.usingClientEntryPoint = true;
+    try {
+      return m.hydrateRoot(c, h, o);
+    } finally {
+      i.usingClientEntryPoint = false;
+    }
+  };
 }
 
 
