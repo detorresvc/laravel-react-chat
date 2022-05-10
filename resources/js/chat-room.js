@@ -162,7 +162,9 @@ const ChatRoom = () => {
       await setIsSendingMessage(false)
 
       messageBoxRef.current.focus()
-      messagesBoxRef.current.scrollTop  = messagesBoxRef.current.scrollHeight
+      setTimeout(() => {
+        messagesBoxRef.current.scrollTop  = messagesBoxRef.current.scrollHeight
+      }, 500)
     }
   }
 
@@ -181,7 +183,9 @@ const ChatRoom = () => {
 
   const scrollToBottom = e => {
     e.preventDefault()
-    messagesBoxRef.current.scrollTop  = messagesBoxRef.current.scrollHeight
+    setTimeout(() => {
+      messagesBoxRef.current.scrollTop  = messagesBoxRef.current.scrollHeight
+    }, 500)
     setHasNewMessage(false)
   }
 

@@ -2448,7 +2448,9 @@ var ChatRoom = function ChatRoom() {
 
             case 12:
               messageBoxRef.current.focus();
-              messagesBoxRef.current.scrollTop = messagesBoxRef.current.scrollHeight;
+              setTimeout(function () {
+                messagesBoxRef.current.scrollTop = messagesBoxRef.current.scrollHeight;
+              }, 500);
 
             case 14:
             case "end":
@@ -2503,7 +2505,9 @@ var ChatRoom = function ChatRoom() {
 
   var scrollToBottom = function scrollToBottom(e) {
     e.preventDefault();
-    messagesBoxRef.current.scrollTop = messagesBoxRef.current.scrollHeight;
+    setTimeout(function () {
+      messagesBoxRef.current.scrollTop = messagesBoxRef.current.scrollHeight;
+    }, 500);
     setHasNewMessage(false);
   };
 
