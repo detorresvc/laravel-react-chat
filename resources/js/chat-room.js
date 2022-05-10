@@ -122,7 +122,9 @@ const ChatRoom = () => {
     const response = await axios.get(`${appConfig.baseUrl}/messages`, appConfig.axiosConfig)
     if(response.status === 200){
       await setMessages(response.data)
-      messagesBoxRef.current.scrollTop  = messagesBoxRef.current.scrollHeight
+      setTimeout(() => {
+        messagesBoxRef.current.scrollTop  = messagesBoxRef.current.scrollHeight
+      }, 500)
 
       window.Echo.private('chat')
       .listen('MessageSent', (e) => {
@@ -136,11 +138,16 @@ const ChatRoom = () => {
   }
 
   React.useEffect(() => {
-    watchGetUsers()
     watchGetProfile()
-    watchFetchMessages()
-    watchWhosTyping()
   }, [])
+
+  React.useEffect(() => {
+    if(profile){
+      watchGetUsers()
+      watchFetchMessages()
+      watchWhosTyping()
+    }
+  }, [profile])
 
   const onHandleSendMessage = async e => {
     e.preventDefault()
@@ -162,7 +169,9 @@ const ChatRoom = () => {
       await setIsSendingMessage(false)
 
       messageBoxRef.current.focus()
-      messagesBoxRef.current.scrollTop  = messagesBoxRef.current.scrollHeight
+      setTimeout(() => {
+        messagesBoxRef.current.scrollTop  = messagesBoxRef.current.scrollHeight
+      }, 500)
     }
   }
 
