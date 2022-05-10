@@ -122,7 +122,9 @@ const ChatRoom = () => {
     const response = await axios.get(`${appConfig.baseUrl}/messages`, appConfig.axiosConfig)
     if(response.status === 200){
       await setMessages(response.data)
-      messagesBoxRef.current.scrollTop  = messagesBoxRef.current.scrollHeight
+      setTimeout(() => {
+        messagesBoxRef.current.scrollTop  = messagesBoxRef.current.scrollHeight
+      }, 500)
 
       window.Echo.private('chat')
       .listen('MessageSent', (e) => {
@@ -183,9 +185,7 @@ const ChatRoom = () => {
 
   const scrollToBottom = e => {
     e.preventDefault()
-    setTimeout(() => {
-      messagesBoxRef.current.scrollTop  = messagesBoxRef.current.scrollHeight
-    }, 500)
+    messagesBoxRef.current.scrollTop  = messagesBoxRef.current.scrollHeight
     setHasNewMessage(false)
   }
 

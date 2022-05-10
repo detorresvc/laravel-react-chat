@@ -2382,7 +2382,9 @@ var ChatRoom = function ChatRoom() {
               return setMessages(response.data);
 
             case 6:
-              messagesBoxRef.current.scrollTop = messagesBoxRef.current.scrollHeight;
+              setTimeout(function () {
+                messagesBoxRef.current.scrollTop = messagesBoxRef.current.scrollHeight;
+              }, 500);
               window.Echo["private"]('chat').listen('MessageSent', function (e) {
                 setMessages(function (prev) {
                   return [].concat(_toConsumableArray(prev), [e.message]);
@@ -2505,9 +2507,7 @@ var ChatRoom = function ChatRoom() {
 
   var scrollToBottom = function scrollToBottom(e) {
     e.preventDefault();
-    setTimeout(function () {
-      messagesBoxRef.current.scrollTop = messagesBoxRef.current.scrollHeight;
-    }, 500);
+    messagesBoxRef.current.scrollTop = messagesBoxRef.current.scrollHeight;
     setHasNewMessage(false);
   };
 
