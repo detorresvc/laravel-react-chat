@@ -2110,8 +2110,10 @@ window.Pusher = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/d
 window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   broadcaster: 'pusher',
   key: "a13070e2108b68cf78a9",
-  cluster: "us3",
-  forceTLS: true
+  wsHost: window.location.hostname,
+  wsPort: 6001,
+  forceTLS: false,
+  disableStats: true
 });
 
 /***/ }),
@@ -2406,11 +2408,15 @@ var ChatRoom = function ChatRoom() {
   }();
 
   react__WEBPACK_IMPORTED_MODULE_2___default().useEffect(function () {
-    watchGetUsers();
     watchGetProfile();
-    watchFetchMessages();
-    watchWhosTyping();
   }, []);
+  react__WEBPACK_IMPORTED_MODULE_2___default().useEffect(function () {
+    if (profile) {
+      watchGetUsers();
+      watchFetchMessages();
+      watchWhosTyping();
+    }
+  }, [profile]);
 
   var onHandleSendMessage = /*#__PURE__*/function () {
     var _ref4 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4(e) {

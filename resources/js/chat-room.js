@@ -138,11 +138,16 @@ const ChatRoom = () => {
   }
 
   React.useEffect(() => {
-    watchGetUsers()
     watchGetProfile()
-    watchFetchMessages()
-    watchWhosTyping()
   }, [])
+
+  React.useEffect(() => {
+    if(profile){
+      watchGetUsers()
+      watchFetchMessages()
+      watchWhosTyping()
+    }
+  }, [profile])
 
   const onHandleSendMessage = async e => {
     e.preventDefault()
