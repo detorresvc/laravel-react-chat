@@ -43,14 +43,28 @@ const Register = () => {
   }
 
   return (
-    <div className="w-screen h-screen flex">
+    <div className="w-screen h-screen flex bg-indigo-100">
       <div className="flex items-center justify-center m-auto">
         <div className="w-full w-96">
           <form onSubmit={onHandleSubmit} className="bg-white shadow-lg rounded px-12 pt-6 pb-8 mb-4">
             <div
-              className="text-gray-800 text-2xl flex justify-center border-b-2 py-2 mb-4"
+              className="text-gray-800 text-2xl flex justify-center items-center border-b-2 py-2 mb-4 space-x-2"
             >
-              Register
+              <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+              ></path>
+            </svg>
+            <p className="font-bold text-blue-500">Chat Register</p>
             </div>
             <p className="text-xs text-green-500">{notification?.['success'] || null }</p>
             <div className="mb-4">
